@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 
 // Define the form schema using Zod
@@ -11,10 +10,8 @@ const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-// Infer the type from the schema
 type LoginFormData = z.infer<typeof loginSchema>;
 
-// Component
 const LoginForm: React.FC = () => {
   const {
     register,
@@ -28,6 +25,7 @@ const LoginForm: React.FC = () => {
     },
   });
   const [showPassword, setShowPassword] = useState(false);
+
   const onSubmit: SubmitHandler<LoginFormData> = async (data) => {
     try {
       console.log("Login submitted:", data);
@@ -38,12 +36,15 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-8 bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg border border-gray-100">
-      <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
+    <div className="w-full max-w-md mx-auto mt-6 sm:mt-10 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg border border-gray-100">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center text-gray-800">
         Sign In
       </h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-4 sm:space-y-6"
+      >
         {/* Email Field */}
         <div className="relative">
           <label
@@ -56,7 +57,7 @@ const LoginForm: React.FC = () => {
             id="email"
             type="email"
             {...register("email")}
-            className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:bg-white transition-all duration-300 ease-in-out shadow-sm hover:shadow-md"
+            className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:bg-white transition-all duration-300 ease-in-out shadow-sm hover:shadow-md"
             placeholder="john.doe@example.com"
           />
           {errors.email && (
@@ -77,7 +78,7 @@ const LoginForm: React.FC = () => {
               id="password"
               type={showPassword ? "text" : "password"}
               {...register("password")}
-              className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:bg-white transition-all duration-300 ease-in-out shadow-sm hover:shadow-md"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:bg-white transition-all duration-300 ease-in-out shadow-sm hover:shadow-md"
               placeholder="••••••••"
             />
             <button
@@ -133,7 +134,7 @@ const LoginForm: React.FC = () => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
+          className="w-full py-2 sm:py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed hover:cursor-pointer"
         >
           {isSubmitting ? (
             <span className="flex items-center justify-center">
@@ -161,18 +162,21 @@ const LoginForm: React.FC = () => {
       </form>
 
       {/* Additional Links */}
-      <div className="mt-4 text-center">
+      <div className="mt-4 text-center text-sm sm:text-base">
         <a
           href="#"
-          className="text-sm text-indigo-600 hover:text-indigo-800 transition-colors"
+          className="text-indigo-600 hover:text-indigo-800 transition-colors"
         >
           Forgot Password?
         </a>
       </div>
-      <div className="mt-4 text-center">
+      <div className="mt-4 text-center text-sm sm:text-base">
         <p>
           New to Book Management?{" "}
-          <Link className="text-purple-600" to={"/register"}>
+          <Link
+            className="text-purple-600 hover:text-purple-800 transition-colors"
+            to="/register"
+          >
             Register
           </Link>
         </p>
