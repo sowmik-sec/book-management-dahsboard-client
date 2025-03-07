@@ -33,7 +33,7 @@ const MainLayout: React.FC = () => {
             alignItems: "center",
           }}
         >
-          <h1>Book Management</h1>
+          <h1 className="text-xl font-semibold">Book Management</h1>
         </div>
         <Menu
           theme="dark"
