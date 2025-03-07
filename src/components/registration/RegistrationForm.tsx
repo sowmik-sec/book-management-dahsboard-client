@@ -3,6 +3,7 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
 
 // Schema (unchanged)
 const registrationSchema = z.object({
@@ -186,6 +187,14 @@ const RegistrationForm: React.FC = () => {
             "Register Now"
           )}
         </button>
+        <div className="mt-4 text-center">
+          <p>
+            Already have an account?{" "}
+            <Link className="text-purple-600" to={"/login"}>
+              Sign in
+            </Link>
+          </p>
+        </div>
       </form>
     </div>
   );
