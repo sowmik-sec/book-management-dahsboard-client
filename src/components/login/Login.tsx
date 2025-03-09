@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useLoginMutation } from "../../redux/features/auth/authApi";
+import { verifyToken } from "../../utils/verifyToken";
+import { useAppDispatch } from "../../redux/hook";
+import { setUser } from "../../redux/features/auth/authSlice";
 
 // Define the form schema using Zod
 const loginSchema = z.object({
@@ -25,15 +29,27 @@ const LoginForm: React.FC = () => {
     },
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [login, { error }] = useLoginMutation();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const onSubmit: SubmitHandler<LoginFormData> = async (data) => {
     try {
-      console.log("Login submitted:", data);
+      const userInfo = {
+        email: data.email,
+        password: data.password,
+      };
+      const res = await login(userInfo).unwrap();
+      const user = verifyToken(res?.data?.accessToken);
+      console.log(user);
+      dispatch(setUser({ user, token: res.data.accessToken }));
+      navigate("/");
     } catch (error) {
       console.error("Login failed:", error);
       alert("Login failed. Please try again.");
     }
   };
+  console.log(error);
 
   return (
     <div className="w-full max-w-md mx-auto mt-6 sm:mt-10 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg border border-gray-100">
