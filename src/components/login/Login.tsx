@@ -29,7 +29,7 @@ const LoginForm: React.FC = () => {
     },
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [login, { error }] = useLoginMutation();
+  const [login] = useLoginMutation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -49,7 +49,6 @@ const LoginForm: React.FC = () => {
       alert("Login failed. Please try again.");
     }
   };
-  console.log(error);
 
   return (
     <div className="w-full max-w-md mx-auto mt-6 sm:mt-10 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg border border-gray-100">

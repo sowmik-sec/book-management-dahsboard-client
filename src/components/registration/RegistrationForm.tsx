@@ -3,7 +3,14 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  useLoginMutation,
+  useSignupMutation,
+} from "../../redux/features/auth/authApi";
+import { useAppDispatch } from "../../redux/hook";
+import { verifyToken } from "../../utils/verifyToken";
+import { setUser } from "../../redux/features/auth/authSlice";
 
 // Schema (unchanged)
 const registrationSchema = z.object({
@@ -32,10 +39,29 @@ const RegistrationForm: React.FC = () => {
       contactNo: "",
     },
   });
+  const [signup, { isError }] = useSignupMutation();
+  const [login] = useLoginMutation();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const onSubmit: SubmitHandler<RegistrationFormData> = async (data) => {
     console.log("Form submitted:", data);
+    const res = await signup(data).unwrap();
+    if (res.success) {
+      console.log("here I am");
+      const userInfo = {
+        email: data.email,
+        password: data.password,
+      };
+      const res = await login(userInfo).unwrap();
+      const user = verifyToken(res?.data?.accessToken);
+      console.log(user);
+      dispatch(setUser({ user, token: res.data.accessToken }));
+      navigate("/");
+    }
+    console.log(res);
   };
+  console.log("it is error ", isError);
 
   return (
     <div className="w-full max-w-md mx-auto mt-6 sm:mt-10 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg border border-gray-100">
