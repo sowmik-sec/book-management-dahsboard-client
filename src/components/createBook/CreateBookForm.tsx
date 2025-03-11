@@ -9,6 +9,8 @@ import React from "react";
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useCreateBookMutation } from "../../redux/features/book/bookApi";
+import { useNavigate } from "react-router-dom";
 
 // Schema (unchanged)
 const bookSchema = z.object({
@@ -66,6 +68,9 @@ const CreateBookForm: React.FC = () => {
     name: "genres",
   });
 
+  const [createBook] = useCreateBookMutation();
+  const navigate = useNavigate();
+
   const onSubmit: SubmitHandler<BookFormData> = async (data) => {
     try {
       const cleanedData = {
@@ -73,8 +78,11 @@ const CreateBookForm: React.FC = () => {
         genres: data.genres.filter((g) => !g.isDeleted),
         releaseDate: data.releaseDate,
       };
-      console.log("Book created:", cleanedData);
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API delay
+      const res = await createBook(cleanedData).unwrap();
+      if (res.success) {
+        alert("Book created successfully");
+        navigate("/book-list");
+      }
     } catch (error) {
       console.error("Book creation failed:", error);
       alert("Failed to create book. Please try again.");
