@@ -10,9 +10,20 @@ const bookApi = baseApi.injectEndpoints({
       }),
     }),
     getBooks: builder.query({
-      query: () => ({
+      query: (queryParams: Record<string, unknown>) => ({
         url: "/books/",
         method: "GET",
+        params: {
+          ...queryParams,
+          page: queryParams.page,
+          limit: queryParams.limit,
+          minPrice: queryParams.minPrice,
+          maxPrice: queryParams.maxPrice,
+          minPageCount: queryParams.minPageCount,
+          maxPageCount: queryParams.maxPageCount,
+          startDate: queryParams.startDate,
+          endDate: queryParams.endDate,
+        },
       }),
     }),
   }),
