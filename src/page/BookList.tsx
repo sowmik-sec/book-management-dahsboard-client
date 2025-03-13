@@ -1,13 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import BookRow from "../components/bookRow/BookRow";
-import { useGetBooksQuery } from "../redux/features/book/bookApi";
+import {
+  useDeleteMultipleBooksMutation,
+  useGetBooksQuery,
+} from "../redux/features/book/bookApi";
+import { useAppSelector } from "../redux/hook";
+import { RootState } from "../redux/store";
 
 const BookList = () => {
   const { data, isLoading } = useGetBooksQuery({ searchTerm: "" });
+  const [deleteMultiple, { isSuccess: isMultipleDeleteSuccess }] =
+    useDeleteMultipleBooksMutation();
+  const bookIds = useAppSelector((state: RootState) => state.book.bookIds);
+
   if (isLoading) {
     return <p>Loading...</p>;
   }
   console.log(data.data.result);
+  const handleMultipleDelete = () => {
+    console.log(bookIds);
+    deleteMultiple({ bookIds });
+    if (isMultipleDeleteSuccess) {
+      alert("Books deleted successfully");
+    }
+  };
+
   return (
     <div>
       Book list page
@@ -38,6 +55,11 @@ const BookList = () => {
             <BookRow {...book} key={book._id} />
           ))}
         </table>
+        {bookIds.length && (
+          <button onClick={handleMultipleDelete} className="btn btn-ghost">
+            Delete Multiple Books
+          </button>
+        )}
       </div>
     </div>
   );

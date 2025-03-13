@@ -26,14 +26,22 @@ const bookApi = baseApi.injectEndpoints({
           endDate: queryParams.endDate,
         },
       }),
-      providesTags: ["deleteBookById", "createBook"],
+      providesTags: ["deleteBook", "createBook"],
     }),
     deleteSingleBook: builder.mutation({
       query: (id) => ({
         url: `/books/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["deleteBookById"],
+      invalidatesTags: ["deleteBook"],
+    }),
+    deleteMultipleBooks: builder.mutation({
+      query: (bookIds) => ({
+        url: "/books/delete-multiple-books",
+        method: "DELETE",
+        body: bookIds,
+      }),
+      invalidatesTags: ["deleteBook"],
     }),
   }),
 });
@@ -42,4 +50,5 @@ export const {
   useCreateBookMutation,
   useGetBooksQuery,
   useDeleteSingleBookMutation,
+  useDeleteMultipleBooksMutation,
 } = bookApi;

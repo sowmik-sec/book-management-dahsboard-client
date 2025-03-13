@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { baseApi } from "./api/baseApi";
+import bookReducer from "./features/book/bookSlice";
 import {
   persistReducer,
   FLUSH,
@@ -23,6 +24,7 @@ export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,
     auth: persistedAuthReducer,
+    book: bookReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

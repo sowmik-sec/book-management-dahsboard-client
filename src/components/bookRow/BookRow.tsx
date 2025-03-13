@@ -1,4 +1,6 @@
 import { useDeleteSingleBookMutation } from "../../redux/features/book/bookApi";
+import { toggleBookId } from "../../redux/features/book/bookSlice";
+import { useAppDispatch } from "../../redux/hook";
 
 export enum BookFormat {
   Hardcover = "hardcover",
@@ -28,7 +30,9 @@ export type TBook = {
 };
 
 const BookRow = (book: TBook) => {
-  const [deleteSingleBook, { isSuccess }] = useDeleteSingleBookMutation();
+  const [deleteSingleBook, { isSuccess: isSingleDeleteSuccess }] =
+    useDeleteSingleBookMutation();
+  const dispatch = useAppDispatch();
   const {
     _id,
     name,
@@ -51,7 +55,7 @@ const BookRow = (book: TBook) => {
   const handleSingleDelete = (id: string) => {
     console.log(id);
     deleteSingleBook(id);
-    if (isSuccess) {
+    if (isSingleDeleteSuccess) {
       alert("Book Deleted successfully");
     }
   };
@@ -61,7 +65,11 @@ const BookRow = (book: TBook) => {
       <tr>
         <th>
           <label>
-            <input type="checkbox" className="checkbox checkbox-secondary" />
+            <input
+              onClick={() => dispatch(toggleBookId(_id))}
+              type="checkbox"
+              className="checkbox checkbox-secondary"
+            />
           </label>
         </th>
         <td>{name}</td>
