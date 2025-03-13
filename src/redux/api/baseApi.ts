@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // https://book-management-dashboard-server-kohl.vercel.app/api/v1
+// http://localhost:5000/api/v1
 
 import {
   BaseQueryApi,
@@ -59,6 +60,6 @@ const baseQueryWithRefreshToken: BaseQueryFn<
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithRefreshToken,
-  tagTypes: ["createBook", "deleteBook"],
+  tagTypes: ["book"],
   endpoints: () => ({}),
 });
