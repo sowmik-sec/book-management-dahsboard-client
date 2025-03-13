@@ -1,3 +1,5 @@
+import { useDeleteSingleBookMutation } from "../../redux/features/book/bookApi";
+
 export enum BookFormat {
   Hardcover = "hardcover",
   Paperback = "paperback",
@@ -10,6 +12,7 @@ export type TGenre = {
 };
 
 export type TBook = {
+  _id: string;
   name: string;
   price: number;
   quantity: number;
@@ -25,7 +28,9 @@ export type TBook = {
 };
 
 const BookRow = (book: TBook) => {
+  const [deleteSingleBook, { isSuccess }] = useDeleteSingleBookMutation();
   const {
+    _id,
     name,
     price,
     quantity,
@@ -42,6 +47,15 @@ const BookRow = (book: TBook) => {
   const date = new Date(releaseDate);
   const year = date.getFullYear();
   const month = date.getMonth();
+
+  const handleSingleDelete = (id: string) => {
+    console.log(id);
+    deleteSingleBook(id);
+    if (isSuccess) {
+      alert("Book Deleted successfully");
+    }
+  };
+
   return (
     <tbody>
       <tr>
@@ -71,7 +85,12 @@ const BookRow = (book: TBook) => {
           <button className="btn btn-ghost btn-info btn-xs">duplicate</button>
         </th>
         <th>
-          <button className="btn btn-ghost btn-error btn-xs">delete</button>
+          <button
+            onClick={() => handleSingleDelete(_id)}
+            className="btn btn-ghost btn-error btn-xs"
+          >
+            delete
+          </button>
         </th>
       </tr>
     </tbody>
