@@ -1,6 +1,26 @@
+import { FC } from "react";
 import { useDeleteSingleBookMutation } from "../../redux/features/book/bookApi";
 import { toggleBookId } from "../../redux/features/book/bookSlice";
 import { useAppDispatch } from "../../redux/hook";
+export interface BookData {
+  _id: string;
+  name: string;
+  author: string;
+  price: number;
+  releaseDate: string;
+  publisher: string;
+  isbn: string;
+  language: string;
+  series?: string;
+  genres: { genre: string; isDeleted: boolean }[];
+  format: BookFormat;
+  pageCount: number;
+  quantity: number;
+}
+interface BookRowProps extends BookData {
+  onEdit: (book: BookData) => void;
+  onDuplicate: (book: BookData) => void;
+}
 
 export enum BookFormat {
   Hardcover = "hardcover",
@@ -29,25 +49,42 @@ export type TBook = {
   pageCount: number;
 };
 
-const BookRow = (book: TBook) => {
+const BookRow: FC<BookRowProps> = ({
+  _id,
+  name,
+  author,
+  price,
+  releaseDate,
+  publisher,
+  isbn,
+  language,
+  series,
+  genres,
+  format,
+  pageCount,
+  quantity,
+  onEdit,
+  onDuplicate,
+}) => {
   const [deleteSingleBook, { isSuccess: isSingleDeleteSuccess }] =
     useDeleteSingleBookMutation();
   const dispatch = useAppDispatch();
-  const {
-    _id,
-    name,
-    price,
-    quantity,
-    author,
-    publisher,
-    format,
-    pageCount,
-    genres,
-    language,
-    releaseDate,
-    isbn,
-    series,
-  } = book;
+  // const {
+  //   _id,
+  //   name,
+  //   price,
+  //   quantity,
+  //   author,
+  //   publisher,
+  //   format,
+  //   pageCount,
+  //   genres,
+  //   language,
+  //   releaseDate,
+  //   isbn,
+  //   series,
+  // } = book;
+
   const date = new Date(releaseDate);
   const year = date.getFullYear();
   const month = date.getMonth();
@@ -59,7 +96,21 @@ const BookRow = (book: TBook) => {
       alert("Book Deleted successfully");
     }
   };
-
+  const bookData: BookData = {
+    _id,
+    name,
+    author,
+    price,
+    releaseDate,
+    publisher,
+    isbn,
+    language,
+    series,
+    genres,
+    format,
+    pageCount,
+    quantity,
+  };
   return (
     <tbody>
       <tr>
@@ -87,10 +138,20 @@ const BookRow = (book: TBook) => {
         <td>{isbn}</td>
         <td>{series}</td>
         <th>
-          <button className="btn btn-ghost btn-xs">edit</button>
+          <button
+            onClick={() => onEdit(bookData)}
+            className="btn btn-ghost btn-xs"
+          >
+            edit
+          </button>
         </th>
         <th>
-          <button className="btn btn-ghost btn-info btn-xs">duplicate</button>
+          <button
+            onClick={() => onDuplicate(bookData)}
+            className="btn btn-ghost btn-info btn-xs"
+          >
+            duplicate
+          </button>
         </th>
         <th>
           <button

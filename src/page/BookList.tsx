@@ -1,22 +1,40 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import BookRow from "../components/bookRow/BookRow";
+import { useState } from "react";
+import BookRow, { BookData } from "../components/bookRow/BookRow";
 import {
   useDeleteMultipleBooksMutation,
   useGetBooksQuery,
 } from "../redux/features/book/bookApi";
 import { useAppSelector } from "../redux/hook";
 import { RootState } from "../redux/store";
+import BookModal, { BookFormData } from "../components/bookModal/BookModal";
 
 const BookList = () => {
   const { data, isLoading } = useGetBooksQuery({ searchTerm: "" });
   const [deleteMultiple, { isSuccess: isMultipleDeleteSuccess }] =
     useDeleteMultipleBooksMutation();
   const bookIds = useAppSelector((state: RootState) => state.book.bookIds);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<BookData | null>(null);
+  const [modalMode, setModalMode] = useState<"create" | "edit" | "duplicate">(
+    "create"
+  );
+
+  const handleEdit = (book: BookData) => {
+    setSelectedBook(book);
+    setModalMode("edit");
+    setModalOpen(true);
+  };
+
+  const handleDuplicate = (book: BookData) => {
+    setSelectedBook(book);
+    setModalMode("duplicate");
+    setModalOpen(true);
+  };
 
   if (isLoading) {
     return <p>Loading...</p>;
   }
-  console.log(data.data.result);
   const handleMultipleDelete = () => {
     console.log(bookIds);
     deleteMultiple({ bookIds });
@@ -51,8 +69,13 @@ const BookList = () => {
               <th>delete</th>
             </tr>
           </>
-          {data?.data?.result?.map((book: any) => (
-            <BookRow {...book} key={book._id} />
+          {data?.data?.result?.map((book: BookFormData) => (
+            <BookRow
+              {...book}
+              key={book._id}
+              onEdit={handleEdit}
+              onDuplicate={handleDuplicate}
+            />
           ))}
         </table>
         {bookIds.length && (
@@ -60,6 +83,12 @@ const BookList = () => {
             Delete Multiple Books
           </button>
         )}
+        <BookModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          book={selectedBook}
+          mode={modalMode}
+        />
       </div>
     </div>
   );
