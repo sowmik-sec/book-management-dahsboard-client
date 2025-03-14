@@ -2,6 +2,7 @@ import { FC } from "react";
 import { useForm } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useCreateSaleMutation } from "../../redux/features/sale/saleApi";
 
 type SaleFormData = {
   book: string;
@@ -33,13 +34,19 @@ const SaleModal: FC<SaleModalProp> = ({ id, name, quantity }) => {
     },
   });
 
+  const [createSale] = useCreateSaleMutation();
+
   const saleDate = watch("saleDate");
 
-  const onSubmit = (data: SaleFormData) => {
+  const onSubmit = async (data: SaleFormData) => {
     console.log("Form submitted:", data);
-    reset();
-    const modal = document.getElementById("sale_modal") as HTMLDialogElement;
-    modal.close();
+    const res = await createSale(data).unwrap();
+    console.log(res);
+    if (res?.success) {
+      reset();
+      const modal = document.getElementById("sale_modal") as HTMLDialogElement;
+      modal.close();
+    }
   };
 
   const handleDateChange = (date: Date | null) => {

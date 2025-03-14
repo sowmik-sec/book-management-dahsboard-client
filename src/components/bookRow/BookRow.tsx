@@ -2,7 +2,11 @@ import { FC } from "react";
 import { useDeleteSingleBookMutation } from "../../redux/features/book/bookApi";
 import { toggleBookId } from "../../redux/features/book/bookSlice";
 import { useAppDispatch } from "../../redux/hook";
-import SaleModal from "../saleModal/SaleModal";
+import { useForm } from "react-hook-form";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { useCreateSaleMutation } from "../../redux/features/sale/saleApi";
+
 export interface BookData {
   _id: string;
   name: string;
@@ -18,6 +22,7 @@ export interface BookData {
   pageCount: number;
   quantity: number;
 }
+
 interface BookRowProps extends BookData {
   onEdit: (book: BookData) => void;
   onDuplicate: (book: BookData) => void;
@@ -29,25 +34,12 @@ export enum BookFormat {
   EBook = "e-book",
   Audiobook = "audiobook",
 }
-export type TGenre = {
-  genre: string;
-  isDeleted: boolean;
-};
 
-export type TBook = {
-  _id: string;
-  name: string;
-  price: number;
+type SaleFormData = {
+  book: string;
   quantity: number;
-  releaseDate: Date;
-  author: string;
-  isbn?: string;
-  genres: [TGenre];
-  publisher: string;
-  series?: string;
-  language: string;
-  format: BookFormat;
-  pageCount: number;
+  buyer: string;
+  saleDate: Date | null;
 };
 
 const BookRow: FC<BookRowProps> = ({
@@ -70,21 +62,25 @@ const BookRow: FC<BookRowProps> = ({
   const [deleteSingleBook, { isSuccess: isSingleDeleteSuccess }] =
     useDeleteSingleBookMutation();
   const dispatch = useAppDispatch();
-  // const {
-  //   _id,
-  //   name,
-  //   price,
-  //   quantity,
-  //   author,
-  //   publisher,
-  //   format,
-  //   pageCount,
-  //   genres,
-  //   language,
-  //   releaseDate,
-  //   isbn,
-  //   series,
-  // } = book;
+  const [createSale] = useCreateSaleMutation();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+    watch,
+  } = useForm<SaleFormData>({
+    defaultValues: {
+      book: _id,
+      quantity: 1,
+      buyer: "",
+      saleDate: new Date(),
+    },
+  });
+
+  const saleDate = watch("saleDate");
 
   const date = new Date(releaseDate);
   const year = date.getFullYear();
@@ -97,6 +93,7 @@ const BookRow: FC<BookRowProps> = ({
       alert("Book Deleted successfully");
     }
   };
+
   const bookData: BookData = {
     _id,
     name,
@@ -112,8 +109,37 @@ const BookRow: FC<BookRowProps> = ({
     pageCount,
     quantity,
   };
+
+  const onSubmit = async (data: SaleFormData) => {
+    console.log("Form submitted:", data);
+    const res = await createSale(data).unwrap();
+    console.log(res);
+    if (res?.success) {
+      reset();
+      const modal = document.getElementById(
+        `sale_modal_${_id}`
+      ) as HTMLDialogElement;
+      modal.close();
+    }
+  };
+
+  const handleDateChange = (date: Date | null) => {
+    setValue("saleDate", date, { shouldValidate: true });
+  };
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (isNaN(value)) {
+      setValue("quantity", 1, { shouldValidate: true });
+    } else if (value > quantity) {
+      setValue("quantity", quantity, { shouldValidate: true });
+    } else {
+      setValue("quantity", value, { shouldValidate: true });
+    }
+  };
+
   return (
-    <tbody>
+    <>
       <tr>
         <th>
           <label>
@@ -142,8 +168,8 @@ const BookRow: FC<BookRowProps> = ({
           <button
             className="btn btn-ghost btn-xs"
             onClick={() => {
-              const modal = document?.getElementById(
-                "sale_modal"
+              const modal = document.getElementById(
+                `sale_modal_${_id}`
               ) as HTMLDialogElement;
               if (modal) {
                 modal.showModal();
@@ -178,8 +204,113 @@ const BookRow: FC<BookRowProps> = ({
           </button>
         </th>
       </tr>
-      <SaleModal id={_id} name={name} quantity={quantity} />
-    </tbody>
+
+      {/* Modal specific to this book */}
+      <dialog
+        id={`sale_modal_${_id}`}
+        className="modal modal-bottom sm:modal-middle"
+      >
+        <div className="modal-box bg-white">
+          <h3 className="font-bold text-lg mb-4">New Sale - {name}</h3>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="form-control mb-4">
+              <label className="label">
+                <span className="label-text">Book ID</span>
+              </label>
+              <input
+                type="text"
+                className={`input input-bordered w-full text-black bg-white border-purple-400 ${
+                  errors.book ? "border-error" : ""
+                }`}
+                {...register("book", { required: "Book ID is required" })}
+                disabled
+              />
+              {errors.book && (
+                <span className="text-error text-sm mt-1">
+                  {errors.book.message}
+                </span>
+              )}
+            </div>
+
+            <div className="form-control mb-4">
+              <label className="label">
+                <span className="label-text">Quantity (Max: {quantity})</span>
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={quantity}
+                className={`input input-bordered w-full text-black bg-white border-purple-400 ${
+                  errors.quantity ? "border-error" : ""
+                }`}
+                {...register("quantity", {
+                  required: "Quantity is required",
+                  valueAsNumber: true,
+                  min: { value: 1, message: "Quantity must be at least 1" },
+                  max: {
+                    value: quantity,
+                    message: `Quantity cannot exceed ${quantity}`,
+                  },
+                })}
+                onChange={handleQuantityChange}
+              />
+              {errors.quantity && (
+                <span className="text-error text-sm mt-1">
+                  {errors.quantity.message}
+                </span>
+              )}
+            </div>
+
+            <div className="form-control mb-4">
+              <label className="label">
+                <span className="label-text">Buyer Name</span>
+              </label>
+              <input
+                type="text"
+                className={`input input-bordered w-full text-black bg-white border-purple-400 ${
+                  errors.buyer ? "border-error" : ""
+                }`}
+                {...register("buyer", { required: "Buyer name is required" })}
+              />
+              {errors.buyer && (
+                <span className="text-error text-sm mt-1">
+                  {errors.buyer.message}
+                </span>
+              )}
+            </div>
+
+            <div className="form-control mb-4">
+              <label className="label">
+                <span className="label-text">Sale Date</span>
+              </label>
+              <DatePicker
+                selected={saleDate}
+                onChange={handleDateChange}
+                showTimeSelect
+                dateFormat="Pp"
+                className={`input input-bordered w-full text-black bg-white border-purple-400 ${
+                  errors.saleDate ? "border-error" : ""
+                }`}
+              />
+              {errors.saleDate && (
+                <span className="text-error text-sm mt-1">
+                  {errors.saleDate.message}
+                </span>
+              )}
+            </div>
+
+            <div className="modal-action">
+              <button type="submit" className="btn btn-primary">
+                Submit
+              </button>
+              <form method="dialog">
+                <button className="btn btn-ghost">Close</button>
+              </form>
+            </div>
+          </form>
+        </div>
+      </dialog>
+    </>
   );
 };
 
