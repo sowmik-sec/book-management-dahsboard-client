@@ -4,6 +4,7 @@ import CreateBook from "../page/CreateBook";
 import BookList from "../page/BookList";
 import Register from "../page/Register";
 import Login from "../page/Login";
+import SaleHistory from "../page/SaleHistory";
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
       {
         path: "book-list",
         element: <BookList />,
+      },
+      {
+        path: "sale-history",
+        element: <SaleHistory />,
       },
     ],
   },

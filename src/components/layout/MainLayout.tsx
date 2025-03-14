@@ -16,6 +16,10 @@ const items = [
     key: "book-list",
     label: <NavLink to={"/book-list"}>Book List</NavLink>,
   },
+  {
+    key: "sale-history",
+    label: <NavLink to={"/sale-history"}>Sale History</NavLink>,
+  },
 ];
 
 const MainLayout: React.FC = () => {
