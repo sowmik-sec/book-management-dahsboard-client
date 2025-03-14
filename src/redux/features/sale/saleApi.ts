@@ -10,7 +10,20 @@ const saleApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["sale"],
     }),
+    getSaleHistory: builder.query({
+      query: (params) => ({
+        url: "/sales/",
+        method: "GET",
+        params: {
+          period: params.period || "month",
+          sortBy: params.sortBy || "_id",
+          sortOrder: params.sortOrder || "desc",
+          page: params.page || 1,
+          limit: params.limit || 10,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useCreateSaleMutation } = saleApi;
+export const { useCreateSaleMutation, useGetSaleHistoryQuery } = saleApi;
