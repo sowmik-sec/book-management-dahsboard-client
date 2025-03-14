@@ -26,7 +26,7 @@ const bookApi = baseApi.injectEndpoints({
           endDate: queryParams.endDate,
         },
       }),
-      providesTags: ["book"],
+      providesTags: ["book", "sale"],
     }),
     updateSingleBook: builder.mutation({
       query: ({ id, ...book }) => ({
