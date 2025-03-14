@@ -2,6 +2,7 @@ import { FC } from "react";
 import { useDeleteSingleBookMutation } from "../../redux/features/book/bookApi";
 import { toggleBookId } from "../../redux/features/book/bookSlice";
 import { useAppDispatch } from "../../redux/hook";
+import SaleModal from "../saleModal/SaleModal";
 export interface BookData {
   _id: string;
   name: string;
@@ -139,6 +140,21 @@ const BookRow: FC<BookRowProps> = ({
         <td>{series}</td>
         <th>
           <button
+            className="btn btn-ghost btn-xs"
+            onClick={() => {
+              const modal = document?.getElementById(
+                "sale_modal"
+              ) as HTMLDialogElement;
+              if (modal) {
+                modal.showModal();
+              }
+            }}
+          >
+            Sale
+          </button>
+        </th>
+        <th>
+          <button
             onClick={() => onEdit(bookData)}
             className="btn btn-ghost btn-xs"
           >
@@ -162,6 +178,7 @@ const BookRow: FC<BookRowProps> = ({
           </button>
         </th>
       </tr>
+      <SaleModal id={_id} name={name} quantity={quantity} />
     </tbody>
   );
 };

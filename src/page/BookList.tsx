@@ -84,6 +84,7 @@ const BookList = () => {
               <td>Release Date</td>
               <td>Isbn</td>
               <td>series</td>
+              <th>sale</th>
               <th>edit</th>
               <th>duplicate</th>
               <th>delete</th>
