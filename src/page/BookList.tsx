@@ -10,7 +10,10 @@ import { RootState } from "../redux/store";
 import BookModal, { BookFormData } from "../components/bookModal/BookModal";
 
 const BookList = () => {
-  const { data, isLoading } = useGetBooksQuery({ searchTerm: "" });
+  const [searchText, setSearchText] = useState("");
+  const [search, setSearch] = useState("");
+
+  const { data, isLoading } = useGetBooksQuery({ searchTerm: search });
   const [deleteMultiple, { isSuccess: isMultipleDeleteSuccess }] =
     useDeleteMultipleBooksMutation();
   const bookIds = useAppSelector((state: RootState) => state.book.bookIds);
@@ -43,9 +46,26 @@ const BookList = () => {
     }
   };
 
+  const handleSearch = () => {
+    setSearch(searchText);
+  };
+
   return (
     <div>
-      Book list page
+      <div className="flex items-center justify-center">
+        <div>
+          <input
+            type="text"
+            onChange={(e) => setSearchText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
+            className="px-3 py-2 rounded-md  border-2 border-blue-400"
+          />
+        </div>
+      </div>
       <div className="overflow-x-auto">
         <table className="table">
           {/* head */}
